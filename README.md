@@ -48,7 +48,7 @@ $ python -u runtime.py <br/>
 First make sure you have installed all the dependencies, as mentioned in Requirements section. Also, make sure you have GPU access. </br>
 $ git clone https://github.com/anikxt/text-to-image-GAN.git <br/>
 $ cd ./text-to-image-using-GAN <br/>
-$ jupyter notebook GAN_demo.ipynb (i.e. open the 'GAN_demo.ipynb' file)<br/>
+$ jupyter notebook GAN_Demo.ipynb (i.e. open the 'GAN_Demo.ipynb' file)<br/>
 
 ## Results
 
