@@ -34,21 +34,8 @@ python data_loader.py --data_set="flowers"
 
 - <b>Training</b>
   - Basic usage `python train.py --data_set="flowers"`
-  - Options
-    - `z_dim`: Noise Dimension. Default is 100.
-    - `t_dim`: Text feature dimension. Default is 256.
-    - `batch_size`: Batch Size. Default is 64.
-    - `image_size`: Image dimension. Default is 64.
-    - `gf_dim`: Number of conv in the first layer generator. Default is 64.
-    - `df_dim`: Number of conv in the first layer discriminator. Default is 64.
-    - `gfc_dim`: Dimension of gen untis for for fully connected layer. Default is 1024.
-    - `caption_vector_length`: Length of the caption vector. Default is 1024.
-    - `data_dir`: Data Directory. Default is `Data/`.
-    - `learning_rate`: Learning Rate. Default is 0.0002.
-    - `beta1`: Momentum for adam update. Default is 0.5.
-    - `epochs`: Max number of epochs. Default is 600.
-    - `resume_model`: Resume training from a pretrained model path.
-    - `data_set`: Data Set to train on. Default is flowers.
+  - Options - `z_dim`: Noise Dimension. Default is 100. - `t_dim`: Text feature dimension. Default is 256. - `batch_size`: Batch Size. Default is 64. - `image_size`: Image dimension. Default is 64. - `gf_dim`: Number of conv in the first layer generator. Default is 64. - `df_dim`: Number of conv in the first layer discriminator. Default is 64. - `gfc_dim`: Dimension of gen untis for for fully connected layer. Default is 1024. - `caption_vector_length`: Length of the caption vector. Default is 1024. - `data_dir`: Data Directory. Default is `Data/`. - `learning_rate`: Learning Rate. Default is 0.0002. - `beta1`: Momentum for adam update. Default is 0.5. - `epochs`: Max number of epochs. Default is 600. - `resume_model`: Resume training from a pretrained model path. - `data_set`: Data Set to train on. Default is flowers.
+    <br>
 - <b>Generating Images from Captions</b>
   - Write the captions in text file, and save it as `Data/sample_captions.txt`. Generate the skip thought vectors for these captions using:
   ```
