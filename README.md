@@ -1,63 +1,117 @@
-# Text to Image Synthesis Synthesis using Generative Adversarial Networks
+# Text To Image Synthesis Using Thought Vectors
 
-## Intoduction
+[![Join the chat at https://gitter.im/text-to-image/Lobby](https://badges.gitter.im/text-to-image/Lobby.svg)](https://gitter.im/text-to-image/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This project is mainly inspired from [Generative Adversarial Text-to-Image Synthesis paper](https://arxiv.org/abs/1605.05396). We implemented this model using PyTorch. In this model we train a conditional generative adversarial network, conditioned on text captions, to generate images that correspond to the captions. The network architecture is shown below. This architecture is based on DCGAN.
+This is an experimental tensorflow implementation of synthesizing images from captions using [Skip Thought Vectors][1]. The images are synthesized using the GAN-CLS Algorithm from the paper [Generative Adversarial Text-to-Image Synthesis][2]. This implementation is built on top of the excellent [DCGAN in Tensorflow][3]. The following is the model architecture. The blue bars represent the Skip Thought Vectors for the captions.
 
-<figure><img src='images/dcgan_network.png'></figure>
-Credits: [1]
+![Model architecture](http://i.imgur.com/dNl2HkZ.jpg)
 
-## Datasets
-
-We used the hdf5 format of these datasets which can be found here for [birds_hdf5](https://drive.google.com/file/d/1mNhn6MYpBb-JwE86GC1kk0VJsYj-Pn5j/view) and here for [flowers_hdf5](https://drive.google.com/file/d/1EgnaTrlHGaqK5CCgHKLclZMT_AMSTyh8/view). These hdf5 datasets were converted from [Caltech-UCSD Birds 200](http://www.vision.caltech.edu/visipedia/CUB-200.html) and [Oxford Flowers](http://www.robots.ox.ac.uk/~vgg/data/flowers/102/) datasets.
-
-We used the [text embeddings](https://github.com/reedscot/icml2016) provided by the paper([1]) authors.
+Image Source : [Generative Adversarial Text-to-Image Synthesis][2] Paper
 
 ## Requirements
 
-- PyTorch
-- h5py
-- EasyDict
-- PIL
-- Numpy
+- Python 2.7.6
+- [Tensorflow][4]
+- [h5py][5]
+- [Theano][6] : for skip thought vectors
+- [scikit-learn][7] : for skip thought vectors
+- [NLTK][8] : for skip thought vectors
 
-This implementation only supports running with GPUs.<br/>
+## Datasets
 
-**To install all the dependencies please do:** <br/>
-$ pip install -r requirements.txt<br/>
+- All the steps below for downloading the datasets and models can be performed automatically by running `python download_datasets.py`. Several gigabytes of files will be downloaded and extracted.
+- The model is currently trained on the [flowers dataset][9]. Download the images from [this link][9] and save them in `Data/flowers/jpg`. Also download the captions from [this link][10]. Extract the archive, copy the `text_c10` folder and paste it in `Data/flowers`.
+- Download the pretrained models and vocabulary for skip thought vectors as per the instructions given [here][13]. Save the downloaded files in `Data/skipthoughts`.
+- Make empty directories in Data, `Data/samples`, `Data/val_samples` and `Data/Models`. They will be used for sampling the generated images and saving the trained models.
 
-## Training
+## Usage
 
-**To use this code for training you can:** <br/>
-$ git clone https://github.com/anikxt/text-to-image-GAN.git <br/>
-$ cd ./text-to-image-using-GAN <br/>
-$ python -u runtime.py <br/>
+- <b>Data Processing</b> : Extract the skip thought vectors for the flowers data set using :
 
-**Inputs to the model for training/prediction:**
+```
+python data_loader.py --data_set="flowers"
+```
 
-- `dataset`: Dataset to use `(birds | flowers)`
-- `split` : An integer indicating which split to use `(0 : train | 1: valid | 2: test)`.
-- `save_path` : Path for saving the models and results
-- `pre_trained_disc` : Discriminator pre-tranined model path used for intializing training or continuing from a checkpoint.
-- `pre_trained_gen` Generator pre-tranined model path used for intializing training or continuing from a checkpoint.
-- `cls`: Boolean flag to indicate whether to train with cls algorithms or not.
+- <b>Training</b>
+  - Basic usage `python train.py --data_set="flowers"`
+  - Options
+    - `z_dim`: Noise Dimension. Default is 100.
+    - `t_dim`: Text feature dimension. Default is 256.
+    - `batch_size`: Batch Size. Default is 64.
+    - `image_size`: Image dimension. Default is 64.
+    - `gf_dim`: Number of conv in the first layer generator. Default is 64.
+    - `df_dim`: Number of conv in the first layer discriminator. Default is 64.
+    - `gfc_dim`: Dimension of gen untis for for fully connected layer. Default is 1024.
+    - `caption_vector_length`: Length of the caption vector. Default is 1024.
+    - `data_dir`: Data Directory. Default is `Data/`.
+    - `learning_rate`: Learning Rate. Default is 0.0002.
+    - `beta1`: Momentum for adam update. Default is 0.5.
+    - `epochs`: Max number of epochs. Default is 600.
+    - `resume_model`: Resume training from a pretrained model path.
+    - `data_set`: Data Set to train on. Default is flowers.
+- <b>Generating Images from Captions</b>
+  - Write the captions in text file, and save it as `Data/sample_captions.txt`. Generate the skip thought vectors for these captions using:
+  ```
+  python generate_thought_vectors.py --caption_file="Data/sample_captions.txt"
+  ```
+  - Generate the Images for the thought vectors using:
+  ```
+  python generate_images.py --model_path=<path to the trained model> --n_images=8
+  ```
+  `n_images` specifies the number of images to be generated per caption. The generated images will be saved in `Data/val_samples/`. `python generate_images.py --help` for more options.
 
-## Demo
+## Sample Images Generated
 
-**To get a glimpse of the results generated, you can:** <br/>
-First make sure you have installed all the dependencies, as mentioned in Requirements section. Also, make sure you have GPU access. </br>
-$ git clone https://github.com/anikxt/text-to-image-GAN.git <br/>
-$ cd ./text-to-image-using-GAN <br/>
-$ jupyter notebook GAN_Demo.ipynb (i.e. open the 'GAN_Demo.ipynb' file)<br/>
+Following are the images generated by the generative model from the captions.
 
-## Results
+| Caption                                                                      |                    Generated Images |
+| ---------------------------------------------------------------------------- | ----------------------------------: |
+| the flower shown has yellow anther red pistil and bright red petals          | ![](http://i.imgur.com/SknZ3Sg.jpg) |
+| this flower has petals that are yellow, white and purple and has dark lines  | ![](http://i.imgur.com/8zsv9Nc.jpg) |
+| the petals on this flower are white with a yellow center                     | ![](http://i.imgur.com/vvzv1cE.jpg) |
+| this flower has a lot of small round pink petals.                            | ![](http://i.imgur.com/w0zK1DC.jpg) |
+| this flower is orange in color, and has petals that are ruffled and rounded. | ![](http://i.imgur.com/VfBbRP1.jpg) |
+| the flower has yellow petals and the center of it is brown                   | ![](http://i.imgur.com/IAuOGZY.jpg) |
 
-**Here are a few examples of the images generated by our model:** <br/>
+## Implementation Details
 
-<figure><img src='images/success_birds.png'></figure> <br/>
-<figure><img src='images/success_flowers.png'></figure> <br/>
+- Only the uni-skip vectors from the skip thought vectors are used. I have not tried training the model with combine-skip vectors.
+- The model was trained for around 200 epochs on a GPU. This took roughly 2-3 days.
+- The images generated are 64 x 64 in dimension.
+- While processing the batches before training, the images are flipped horizontally with a probability of 0.5.
+- The train-val split is 0.75.
 
 ## References
 
-[1] Generative Adversarial Text-to-Image Synthesis https://arxiv.org/abs/1605.05396 </br>
-[2] https://github.com/reedscot/icml2016 (the authors version)
+- [Generative Adversarial Text-to-Image Synthesis][2] Paper
+- [Generative Adversarial Text-to-Image Synthesis][11] Code
+- [Skip Thought Vectors][1] Paper
+- [Skip Thought Vectors][12] Code
+- [DCGAN in Tensorflow][3]
+- [DCGAN in Tensorlayer][15]
+
+## Alternate Implementations
+
+- [Text to Image in Torch by Scot Reed][11]
+- [Text to Image in Tensorlayer by Dong Hao][16]
+
+## License
+
+MIT
+
+[1]: http://arxiv.org/abs/1506.06726
+[2]: http://arxiv.org/abs/1605.05396
+[3]: https://github.com/carpedm20/DCGAN-tensorflow
+[4]: https://github.com/tensorflow/tensorflow
+[5]: http://www.h5py.org/
+[6]: https://github.com/Theano/Theano
+[7]: http://scikit-learn.org/stable/index.html
+[8]: http://www.nltk.org/
+[9]: http://www.robots.ox.ac.uk/~vgg/data/flowers/102/
+[10]: https://drive.google.com/file/d/0B0ywwgffWnLLcms2WWJQRFNSWXM/view
+[11]: https://github.com/reedscot/icml2016
+[12]: https://github.com/ryankiros/skip-thoughts
+[13]: https://github.com/ryankiros/skip-thoughts#getting-started
+[14]: https://bitbucket.org/paarth_neekhara/texttomimagemodel/raw/74a4bbaeee26fe31e148a54c4f495694680e2c31/latest_model_flowers_temp.ckpt
+[15]: https://github.com/zsdonghao/dcgan
+[16]: https://github.com/zsdonghao/text-to-image
